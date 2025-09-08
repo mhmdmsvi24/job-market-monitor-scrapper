@@ -1,0 +1,28 @@
+[project]
+name = "job-market-monitor-scrapper"
+version = "0.1.0"
+description = "a simple performant webscrapper"
+authors = [
+    {name = "Mohammad Mousavi",email = "mousavimohammadg@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx (>=0.28.1,<0.29.0)",
+    "lxml (>=6.0.1,<7.0.0)",
+    "asyncio (>=4.0.0,<5.0.0)",
+    "aiofiles (>=24.1.0,<25.0.0)",
+    "pytest (>=8.4.2,<9.0.0)",
+    "pytest-mock (>=3.15.0,<4.0.0)",
+    "socksio (>=1.0.0,<2.0.0)"
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "./jmms"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
