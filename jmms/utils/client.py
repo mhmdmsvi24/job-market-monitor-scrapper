@@ -1,9 +1,8 @@
-import httpx
-from httpx import AsyncClient, ConnectTimeout, RequestError
+from httpx import AsyncClient, ConnectTimeout, RequestError, HTTPStatusError, Response
 
 
-async def get_data(url, headers, proxy, timeout=None, attempts=3):
-    client = httpx.AsyncClient(proxy=proxy, headers=headers, follow_redirects=True)
+async def get_data(url: str, headers: dict[str, str], proxy: str, timeout: int = None, attempts: int = 3) -> None | Response:
+    client = AsyncClient(proxy=proxy, headers=headers, follow_redirects=True)
 
     response = None
     async with client:
@@ -15,7 +14,7 @@ async def get_data(url, headers, proxy, timeout=None, attempts=3):
                 response.raise_for_status()
 
                 return response
-            except httpx.HTTPStatusError as e:
+            except HTTPStatusError as e:
                 print(
                     f"Attempt {attempt + 1}: Received {e.response.status_code} - Retrying..."
                 )

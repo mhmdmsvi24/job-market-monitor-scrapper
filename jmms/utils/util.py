@@ -1,14 +1,16 @@
 import asyncio
 import csv
 from pathlib import Path
-import math
 
-from config import Config
-from utils import parse_html
+def create_dir(path: Path) -> bool:
+    """
 
-from .client import get_data
+    Args:
+      path: Path:
 
-def create_dir(path: Path):
+    Returns:
+
+    """
     if (path.exists(follow_symlinks=False)):
         print(f"This directory already exists")
         return False
@@ -19,6 +21,17 @@ def create_dir(path: Path):
 
 
 def create_csv(base_name: str, create_number: int, rows: list, path: Path | str = None) -> None:
+    """
+
+    Args:
+      base_name: str:
+      create_number: int:
+      rows: list:
+      path: Path | str:  (Default value = None)
+
+    Returns:
+
+    """
     files_path = []
 
     for i in range(create_number):
@@ -38,32 +51,22 @@ def create_csv(base_name: str, create_number: int, rows: list, path: Path | str 
     return files_path
 
 
-def write_csv(data, file, rows):
+def write_csv(data: list[dict[str, str]], file: str, rows: list[str]) -> None:
+    """
+
+    Args:
+      data:
+      file:
+      rows:
+
+    Returns:
+
+    """
     with open(file, "a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=rows)
         writer.writerows(data)
 
 
-async def write_csv_async(data, file, rows, lock):
+async def write_csv_async(data: list[dict[str, str]], file: Path, rows: list[str], lock: asyncio.Lock) -> None:
     async with lock:
         write_csv(data, file, rows)
-
-
-async def get_pages_number(url):
-    response = await get_data(url, Config.headers, Config.proxy)
-    tree = parse_html(response.text)
-    # Number of all pages
-    pages = math.ceil(
-        int(
-            tree.xpath(
-                '//span[contains(@class, "c-jobSearchState__numberOfResultsEcho")]/text()'
-            )[0]
-            .strip()
-            .replace(" ", "")
-            .replace(",", "")
-            .split("\n")[0]
-        )
-        / 100
-    )
-
-    return pages
