@@ -1,30 +1,37 @@
-from lxml import html as lxml_html
-from lxml.etree import Element
 import math
 
 from config import Config
+from lxml import html as lxml_html
+from lxml.etree import Element
 
 from .client import get_data
 
+
 def parse_html(data: str) -> Element:
-    """
+    """Parse raw HTML text into an lxml Element tree.
 
     Args:
-      data:
+        data (str): Raw HTML string.
 
     Returns:
-
+        Element: Parsed HTML tree as an lxml Element.
     """
     return lxml_html.fromstring(data)
 
+
 def extract_jobs_data(container: list[Element]) -> list[dict[str, str]]:
-    """
+    """Extract structured job information from job listing elements.
 
     Args:
-      container:
+        container (list[Element]): A list of `<li>` elements representing job postings.
 
     Returns:
-
+        list[dict[str, str]]: A list of job records.
+        Each dictionary contains:
+            - "title": Job title (str)
+            - "company": Company name (str)
+            - "location": Job location (str)
+            - "contract": Contract type or working conditions (str)
     """
     jobs = []
     for job in container:
@@ -58,10 +65,19 @@ def extract_jobs_data(container: list[Element]) -> list[dict[str, str]]:
 
     return jobs
 
+
 async def get_pages_number(url: str) -> int:
+    """Fetch the total number of job listing pages from the search results.
+
+    Args:
+        url (str): Base URL of the job listing search.
+
+    Returns:
+        int: Total number of pages (rounded up to nearest integer, assuming 100 jobs per page).
+    """
     response = await get_data(url, Config.headers, Config.proxy)
     tree = parse_html(response.text)
-    # Number of all pages
+
     pages = math.ceil(
         int(
             tree.xpath(
