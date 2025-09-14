@@ -1,27 +1,29 @@
 import asyncio
-import random
-import time
-import tracemalloc
-from pathlib import Path
 import math
+import random
+from pathlib import Path
 
 from config import Config
 from utils import (
+    benchmark,
+    create_csv,
+    create_dir,
     extract_jobs_data,
     get_data,
     get_pages_number,
-    create_csv,
-    create_dir,
     parse_html,
     write_csv,
 )
+
 
 async def fetch_page(page: int) -> list[dict[str, str]]:
     url = Config.base_url + f"&page={page}"
     print(f"Scraping Page {page} ---- URL: {url}")
     await asyncio.sleep(random.uniform(0.5, 1))
 
-    response = await get_data(url, Config.headers, Config.proxy, timeout=Config.request_timeout)
+    response = await get_data(
+        url, Config.headers, Config.proxy, timeout=Config.request_timeout
+    )
     if not response:
         return []
 
@@ -31,6 +33,7 @@ async def fetch_page(page: int) -> list[dict[str, str]]:
     )
     return extract_jobs_data(main)
 
+
 async def write_batches(all_results: list[list[dict[str, str]]], csv_files: list[Path]):
     locks = {str(f): asyncio.Lock() for f in csv_files}
 
@@ -39,14 +42,22 @@ async def write_batches(all_results: list[list[dict[str, str]]], csv_files: list
         if not jobs:
             continue
 
-        file_index = i // 10   # or round-robin: i % len(csv_files)
+        file_index = i // 10  # or round-robin: i % len(csv_files)
         file_path = csv_files[file_index]
         lock = locks[str(file_path)]
-        tasks.append(write_csv(jobs, file_path, ["title", "company", "location", "contract"], lock))
+        tasks.append(
+            write_csv(
+                jobs, file_path, ["title", "company", "location", "contract"], lock
+            )
+        )
 
     await asyncio.gather(*tasks)
 
+
+@benchmark
 async def main() -> None:
+    # To Get full number of pages
+    # pages = get_pages_number(Config.base_url)
     pages = 5
     path = Path(__file__).parent / "data"
     create_dir(path)
@@ -68,11 +79,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    tracemalloc.start()
-    start = time.time()
     asyncio.run(main())
-    end = time.time()
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"Scraping finished in {end - start:.2f} seconds")
-    print(f"Current memory usage: {current / 1024 / 1024:.2f} MB")
-    print(f"Peak memory usage: {peak / 1024 / 1024:.2f} MB")

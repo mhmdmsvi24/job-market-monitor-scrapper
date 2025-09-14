@@ -1,5 +1,7 @@
 import asyncio
 import csv
+import time
+import tracemalloc
 from pathlib import Path
 
 
@@ -92,3 +94,21 @@ async def write_csv(
     """
     async with lock:
         write_csv_sync(data, file, rows)
+
+
+import time
+
+
+def benchmark(func):
+    async def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = await func(*args, **kwargs)
+        end = time.perf_counter()
+        current, peak = tracemalloc.get_traced_memory()
+        print(f"-----> Scraping finished in {end - start:.2f} seconds")
+        print(f"-----> Current memory usage: {current / 1024 / 1024:.2f} MB")
+        print(f"-----> Peak memory usage: {peak / 1024 / 1024:.2f} MB")
+
+        return result
+
+    return wrapper
