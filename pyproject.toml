@@ -1,7 +1,7 @@
 [project]
-name = "job-market-monitor-scrapper"
+name = "supraaa"
 version = "0.1.0"
-description = "a simple performant webscrapper"
+description = "a configurable fast webscrapper"
 authors = [
     {name = "Mohammad Mousavi",email = "mousavimohammadg@gmail.com"}
 ]

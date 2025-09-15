@@ -58,7 +58,7 @@ async def write_batches(all_results: list[list[dict[str, str]]], csv_files: list
 async def main() -> None:
     # To Get full number of pages
     # pages = get_pages_number(Config.base_url)
-    pages = 5
+    pages = 50
     path = Path(__file__).parent / "data"
     create_dir(path)
 
